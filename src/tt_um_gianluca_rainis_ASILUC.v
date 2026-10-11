@@ -3,6 +3,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/* 
+ * ASILUC - An ASIC designed to function as an ALU.
+ *
+ * Pinout description:
+ * ui_in[7:0] - The input for the numbers to be processed by the ALU.
+ * uo_out[7:0] - The output for the result of the ALU (16 bits, split into two 8-bit outputs).
+ * uio_in[3:0] - The input for the command to be processed by the ALU.
+ * uio_out[7:4] - The output for the status of the ALU (4 bits - busy | status | highByte | error).
+ * uio_oe[7:0] - The output enable for the io pins. Fixed at 8'b11110000.
+ * ena - Always high when the design is powered, can be ignored.
+ * clk - The clock signal for the design.
+ * rst_n - The reset signal for the design, active low.
+ */
+
 `default_nettype none
 
 module tt_um_gianluca_rainis_ASILUC (
@@ -17,8 +31,6 @@ module tt_um_gianluca_rainis_ASILUC (
 );
 
   assign uio_oe = 8'b11110000;  // [7:4] are outputs (status), [3:0] are inputs (commands)
-  assign uo_out = 0;
-  assign uio_out = 0;           // busy | status | highByte | error
 
   reg [3:0] command_in; // The command received from the uio_in[3:0] inputs
   reg [7:0] first_number_in;  // First number for the operation
@@ -74,16 +86,16 @@ module tt_um_gianluca_rainis_ASILUC (
     end
   end
 
-  uio_out[7:0] <= {asiluc_status, 4'b0000}; // ASILUC status on uio_out[7:4] and zeros on uio_out[3:0]
+  assign uio_out[7:0] = {asiluc_status, 4'b0000}; // ASILUC status on uio_out[7:4] and zeros on uio_out[3:0]
 
   if (asiluc_status == 4'b1100) begin
-    uo_out[7:0] <= number_out[7:0]; // Output the lower 8 bits of the result
+    assign uo_out[7:0] = number_out[7:0]; // Output the lower 8 bits of the result
   end
   else if (asiluc_status == 4'b1110) begin
-    uo_out[7:0] <= number_out[15:8];  // Output the upper 8 bits of the result
+    assign uo_out[7:0] = number_out[15:8];  // Output the upper 8 bits of the result
   end
   else begin
-    uo_out[7:0] <= 8'b00000000; // Default output when not in result state
+    assign uo_out[7:0] = 8'b00000000; // Default output when not in result state
   end
 
   // List all unused inputs to prevent warnings
