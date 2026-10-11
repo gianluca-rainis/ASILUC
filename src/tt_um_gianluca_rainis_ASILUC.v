@@ -41,6 +41,9 @@ module tt_um_gianluca_rainis_ASILUC (
   reg [3:0] asiluc_status = 4'b0000;  // Status register for ASILUC
   reg [1:0] clock_counter = 2'b00;  // Counter to track clock cycles
 
+  reg handle_command_input = 1'b1;  // Flag to indicate if handling command input
+  reg handle_number_input = 1'b0; // Flag to indicate if handling number input
+
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       previous_command_NOP <= 1'b0; // Reset NOP flag on reset
@@ -52,6 +55,8 @@ module tt_um_gianluca_rainis_ASILUC (
       number_out <= 16'b0000000000000000; // Reset result on reset
 
       asiluc_status <= 4'b0000; // Reset status on reset
+      handle_command_input <= 1'b1; // Reset command input flag on reset
+      handle_number_input <= 1'b0;  // Reset number input flag on reset
     end
     else begin
       if (clock_counter == 2'b10) begin
@@ -60,28 +65,64 @@ module tt_um_gianluca_rainis_ASILUC (
       else begin
         clock_counter <= clock_counter + 1'b1;  // Increment counter
       end
-      
-      command_in <= uio_in[3:0];
 
-      if (command_in == 4'b0000) begin
-        previous_command_NOP <= 1'b1; // NOP, set flag
+      if (handle_command_input) begin
+        command_in <= uio_in[3:0];
+
+        if (command_in == 4'b0000) begin
+          previous_command_NOP <= 1'b1; // NOP, set flag
+        end
+        else if (previous_command_NOP) begin
+          clock_counter <= 2'b11;
+
+          if (clock_counter == 2'b00) begin
+            command_in <= uio_in[3:0]; // Save command
+            asiluc_status <= 4'b0100; // Command accepted | Input (first number) expected
+
+            // Handle numbers input
+            handle_number_input <= 1'b1;
+            
+            previous_command_NOP <= 1'b0; // Reset flag
+          end
+
+          clock_counter <= 2'b00;
+        end
+        else begin
+          previous_command_NOP <= 1'b0; // Reset flag if command is not NOP
+          handle_number_input <= 1'b0;  // Reset number input flag
+        end
       end
-      else if (previous_command_NOP) begin
+      else if (handle_number_input) begin
         clock_counter <= 2'b11;
 
-        if (clock_counter == 2'b00) begin
-          command_in <= uio_in[3:0]; // Save command
-          asiluc_status <= 4'b0100; // Command accepted
+        if (clock_counter == 2'b00 && asiluc_status == 4'b0100) begin
+          first_number_in <= ui_in; // Save first number
+          asiluc_status <= 4'b0110; // Input (second number) expected
+        end
+        else if (clock_counter == 2'b00 && asiluc_status == 4'b0110) begin
+          second_number_in <= ui_in; // Save second number
+          asiluc_status <= 4'b1000; // Calculating
 
-          // Handle numbers input
-
-          previous_command_NOP <= 1'b0; // Reset flag
+          handle_number_input <= 1'b0; // Stop handling number input
         end
 
         clock_counter <= 2'b00;
       end
+      else if (asiluc_status == 4'b1000) begin
+        // Handle calculation
+      end
       else begin
-        previous_command_NOP <= 1'b0; // Reset flag if command is not NOP
+        asiluc_status <= 4'b0001; // Error: Invalid state, reset to idle
+        number_out <= 16'b0000000000000000; // Reset result
+        number_out[3:0] <= 4'b0000; // Set error code to Generic Error
+
+        clock_counter <= 2'b11;
+
+        if (clock_counter == 2'b00) begin
+          rst_n <= 1'b0;  // Trigger reset
+        end
+
+        clock_counter <= 2'b00;
       end
     end
   end
