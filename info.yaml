@@ -18,7 +18,7 @@ project:
   # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
   source_files:
     - "tt_um_gianluca_rainis_ASILUC.v"
-    - "half_adder.v"
+    - "phase_timer_ASILUC.v"
     - "adder.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.

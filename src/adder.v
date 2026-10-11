@@ -12,6 +12,5 @@ module adder (
     output  wire    sum,    // Sum output
     output  wire    cout,   // Carry output
 );
-    assign sum = a ^ b ^ cin;               // Sum output
-    assign cout = (a & b) | ((a ^ b) & cin);  // Carry output
+    assign {cout, sum} = a + b + cin;   // Perform addition of a, b, and cin, and assign the result to cout and sum
 endmodule
