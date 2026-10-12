@@ -6,17 +6,19 @@
 `default_nettype none
 
 module calculation_ASILUC (
-    input  wire [7:0]   number1,  // First number for the operation
-    input  wire [7:0]   number2,  // Second number for the operation
-    input  wire [3:0]   command,  // Command for the operation
-    output wire [15:0]  result    // The result of the operation (16 bits)
-    output wire [3:0]   status     // The status of the operation (4 bits)
+    input  wire [7:0]   number1,    // First number for the operation
+    input  wire [7:0]   number2,    // Second number for the operation
+    input  wire [3:0]   command,    // Command for the operation
+    output wire [15:0]  result,     // The result of the operation (16 bits)
+    output wire [3:0]   status      // The status of the operation (4 bits)
 );
 
     reg [15:0] result_reg;   // The result of the operation (16 bits)
     reg [3:0] status_reg;    // The status of the operation (4 bits)
 
     always @(*) begin
+        status_reg = 4'b1000;   // Default status: Calculation
+
         case (command)
             4'b0000: result_reg = 16'b0000000000000000;  // NOP
             4'b0001: result_reg = number1 + number2;     // Addition
