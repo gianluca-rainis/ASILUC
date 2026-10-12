@@ -54,7 +54,7 @@ module tt_um_gianluca_rainis_ASILUC (
   );
 
   always @(posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
+    if (!rst_n) begin // Reset
       previous_command_NOP <= 1'b0; // Reset NOP flag on reset
 
       command_in <= 4'b0000;  // Reset command on reset
@@ -66,8 +66,8 @@ module tt_um_gianluca_rainis_ASILUC (
       handle_command_input <= 1'b1; // Reset command input flag on reset
       handle_number_input <= 1'b0;  // Reset number input flag on reset
     end
-    else begin
-      if (handle_command_input) begin
+    else begin  // Normal operation
+      if (handle_command_input) begin // Handle command input
         command_in <= uio_in[3:0];  // Save command
 
         if (command_in == 4'b0000) begin
@@ -93,7 +93,7 @@ module tt_um_gianluca_rainis_ASILUC (
           handle_number_input <= 1'b0;  // Reset number input flag
         end
       end
-      else if (handle_number_input) begin
+      else if (handle_number_input) begin // Handle number input
         if (last_cycle && asiluc_status == 4'b0100) begin
           first_number_in <= ui_in; // Save first number
           asiluc_status <= 4'b0110; // Input (second number) expected
@@ -105,10 +105,10 @@ module tt_um_gianluca_rainis_ASILUC (
           handle_number_input <= 1'b0; // Stop handling number input
         end
       end
-      else if (asiluc_status == 4'b1000) begin
+      else if (asiluc_status == 4'b1000) begin  // Handle calculation
         // Handle calculation
       end
-      else begin
+      else begin  // Invalid state, reset
         asiluc_status <= 4'b0001; // Error: Invalid state, reset to idle
         number_out <= 16'b0000000000000000; // Reset result
         number_out[3:0] <= 4'b0000; // Set error code to Generic Error
