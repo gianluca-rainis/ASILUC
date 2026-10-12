@@ -41,7 +41,7 @@ module tt_um_gianluca_rainis_ASILUC (
   reg [3:0] asiluc_status = 4'b0000;  // Status register for ASILUC
 
   wire last_cycle;  // Signal to indicate the last cycle of the clock counter has been reached
-  reg run_phase_timer;  // If run the clock phase_timer
+  wire run_phase_timer;  // If run the clock phase_timer
 
   reg handle_command_input = 1'b1;  // Flag to indicate if handling command input
   reg handle_number_input = 1'b0; // Flag to indicate if handling number input
@@ -65,8 +65,6 @@ module tt_um_gianluca_rainis_ASILUC (
       asiluc_status <= 4'b0000; // Reset status on reset
       handle_command_input <= 1'b1; // Reset command input flag on reset
       handle_number_input <= 1'b0;  // Reset number input flag on reset
-
-      run_phase_timer <= 1'b0;  // Stop the clock counter
     end
     else begin
       if (handle_command_input) begin
@@ -80,8 +78,6 @@ module tt_um_gianluca_rainis_ASILUC (
           handle_number_input <= 1'b0;  // Reset number input flag
         end
         else if (previous_command_NOP) begin
-          run_phase_timer <= 1'b1;
-
           if (last_cycle) begin
             asiluc_status <= 4'b0100; // Command accepted | Input (first number) expected
 
@@ -90,7 +86,6 @@ module tt_um_gianluca_rainis_ASILUC (
             handle_command_input <= 1'b0; // Stop handling command input
             
             previous_command_NOP <= 1'b0; // Reset flag
-            run_phase_timer <= 1'b0;  // Stop the clock counter
           end
         end
         else begin
@@ -99,8 +94,6 @@ module tt_um_gianluca_rainis_ASILUC (
         end
       end
       else if (handle_number_input) begin
-        run_phase_timer <= 1'b1;
-
         if (last_cycle && asiluc_status == 4'b0100) begin
           first_number_in <= ui_in; // Save first number
           asiluc_status <= 4'b0110; // Input (second number) expected
@@ -110,8 +103,6 @@ module tt_um_gianluca_rainis_ASILUC (
           asiluc_status <= 4'b1000; // Calculating
 
           handle_number_input <= 1'b0; // Stop handling number input
-
-          run_phase_timer <= 1'b0;  // Stop the clock counter
         end
       end
       else if (asiluc_status == 4'b1000) begin
@@ -121,8 +112,6 @@ module tt_um_gianluca_rainis_ASILUC (
         asiluc_status <= 4'b0001; // Error: Invalid state, reset to idle
         number_out <= 16'b0000000000000000; // Reset result
         number_out[3:0] <= 4'b0000; // Set error code to Generic Error
-
-        run_phase_timer <= 1'b1;
 
         if (last_cycle) begin
           previous_command_NOP <= 1'b0; // Reset NOP flag on reset
@@ -135,12 +124,12 @@ module tt_um_gianluca_rainis_ASILUC (
           asiluc_status <= 4'b0000; // Reset status on reset
           handle_command_input <= 1'b1; // Reset command input flag on reset
           handle_number_input <= 1'b0;  // Reset number input flag on reset
-
-          run_phase_timer <= 1'b0;  // Stop the clock counter
         end
       end
     end
   end
+
+  assign run_phase_timer = (handle_command_input && previous_command_NOP && (command_in > 4'b0000 && command_in < 4'b0101)) || handle_number_input || (asiluc_status == 4'b0001); // Run the phase timer when handling command or number input
 
   assign uio_out = {asiluc_status, 4'b0000}; // ASILUC status on uio_out[7:4] and zeros on uio_out[3:0]
   assign uo_out = (asiluc_status == 4'b1100) ? number_out[7:0] : ((asiluc_status == 4'b1110) ? number_out[15:8] : 8'b0);  // Output the lower 8 bits of the result or the upper 8 bits of the result or zero
