@@ -39,6 +39,8 @@ module tt_um_gianluca_rainis_ASILUC (
 
   reg previous_command_NOP = 1'b0;  // Flag to indicate if the previous command was NOP
   reg [3:0] asiluc_status = 4'b0000;  // Status register for ASILUC
+  reg error_reg = 1'b0; // Error register for ASILUC
+  reg done_calculation = 1'b0;  // Done signal for the calculation module
 
   wire last_cycle;  // Signal to indicate the last cycle of the clock counter has been reached
   wire run_phase_timer;  // If run the clock phase_timer
@@ -54,10 +56,13 @@ module tt_um_gianluca_rainis_ASILUC (
   );
 
   calculation_ASILUC calculation (
+    .number1(first_number_in),
+    .number2(second_number_in),
     .command(command_in),
-    .first_number(first_number_in),
-    .second_number(second_number_in),
-    .result(number_out)
+    .result(number_out),
+    .error(error_reg),
+    .start(asiluc_status == 4'b1000),  // Start calculation when
+    .done(done_calculation) // Done when calculation is complete
   );
 
   always @(posedge clk or negedge rst_n) begin
