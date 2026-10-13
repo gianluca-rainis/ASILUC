@@ -47,6 +47,7 @@ module tt_um_gianluca_rainis_ASILUC (
 
   reg handle_command_input = 1'b1;  // Flag to indicate if handling command input
   reg handle_number_input = 1'b0; // Flag to indicate if handling number input
+  reg handle_calculation = 1'b0;  // Flag to indicate if handling calculation
 
   phase_timer_ASILUC phase_timer (
     .run(run_phase_timer),
@@ -60,6 +61,8 @@ module tt_um_gianluca_rainis_ASILUC (
     .number2(second_number_in),
     .command(command_in),
     .result(number_out),
+    .clk(clk),
+    .rst_n(rst_n),
     .error(error_reg),
     .start(asiluc_status == 4'b1000),  // Start calculation when
     .done(done_calculation) // Done when calculation is complete
@@ -112,13 +115,24 @@ module tt_um_gianluca_rainis_ASILUC (
         end
         else if (last_cycle && asiluc_status == 4'b0110) begin
           second_number_in <= ui_in; // Save second number
-          asiluc_status <= 4'b1000; // Calculating
+          handle_calculation <= 1'b1; // Calculating
 
           handle_number_input <= 1'b0; // Stop handling number input
         end
       end
-      else if (asiluc_status == 4'b1000) begin  // Handle calculation
-        // Handle calculation
+      else if (handle_calculation) begin  // Handle calculation
+        asiluc_status <= 4'b1000; // Calculation in progress
+
+        if (done_calculation) begin
+          if (error_reg) begin
+            asiluc_status <= 4'b0001; // Error occurred
+          end
+          else begin
+            asiluc_status <= 4'b1100; // Calculation done | Output (lower byte) expected
+          end
+
+          handle_calculation <= 1'b0; // Stop handling calculation
+        end
       end
       else begin  // Invalid state, reset
         asiluc_status <= 4'b0001; // Error: Invalid state, reset to idle
