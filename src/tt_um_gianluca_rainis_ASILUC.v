@@ -65,7 +65,7 @@ module tt_um_gianluca_rainis_ASILUC (
     .clk(clk),
     .rst_n(rst_n),
     .error(error_reg),
-    .start(asiluc_status == 4'b1000),  // Start calculation when
+    .start(asiluc_status == 4'b1000),  // Start calculation when ASILUC is in calculation state
     .done(done_calculation) // Done when calculation is complete
   );
 
