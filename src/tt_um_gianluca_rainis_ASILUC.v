@@ -53,6 +53,13 @@ module tt_um_gianluca_rainis_ASILUC (
     .last_cycle(last_cycle)
   );
 
+  calculation_ASILUC calculation (
+    .command(command_in),
+    .first_number(first_number_in),
+    .second_number(second_number_in),
+    .result(number_out)
+  );
+
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin // Reset
       previous_command_NOP <= 1'b0; // Reset NOP flag on reset
