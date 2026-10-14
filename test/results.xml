@@ -1,0 +1,8 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1791961933" />
+    <testcase name="test_project" classname="test" file="/Users/gianlucarainis/Documents/GitHub_Projects/ASILUC/test/test.py" lineno="9" time="0.0032379627227783203" sim_time_ns="100000.0" ratio_time="30883616.81761284">
+      <failure error_type="AssertionError" error_msg="assert LogicArray('00000000', Range(7, 'downto', 0)) == 50&#10; +  where LogicArray('00000000', Range(7, 'downto', 0)) = LogicArrayObject(tb.uo_out).value&#10; +    where LogicArrayObject(tb.uo_out) = HierarchyObject(tb).uo_out" />
+    </testcase>
+  </testsuite>
+</testsuites>
