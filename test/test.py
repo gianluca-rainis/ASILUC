@@ -9,10 +9,11 @@ from cocotb.triggers import ClockCycles
 @cocotb.test()
 async def test_project(dut):
     command = 1
-    number1 = 20
-    number2 = 5
-    expected_output_low = (number1 + number2) & 0xFF
-    expected_output_high = (number1 + number2) >> 8
+    number1 = 21
+    number2 = 36
+    operation_result = int(number1 + number2)   # Change the operation here
+    expected_output_low = (operation_result) & 0xFF
+    expected_output_high = (operation_result) >> 8
 
     dut._log.info("Start")
 
@@ -30,11 +31,12 @@ async def test_project(dut):
     dut.rst_n.value = 1
 
     dut._log.info("Test project behavior")
-    await ClockCycles(dut.clk, 1)
+    await ClockCycles(dut.clk, 3)
 
     # Command input
     dut._log.info("Command input: {}".format(command))
     dut.uio_in.value = command
+    await ClockCycles(dut.clk, 3)
     await ClockCycles(dut.clk, 3)
 
     if int(dut.uio_out.value) >> 4 == 0b0100:
@@ -54,13 +56,28 @@ async def test_project(dut):
         dut._log.info("Calculating output")
         await ClockCycles(dut.clk, 1)
 
+    dut._log.info("Output expected: {}".format(operation_result))
+
     if int(dut.uio_out.value) >> 4 == 0b1100:
-        # Check output
+        # Check output low
         dut._log.info("Check output low: {}".format(expected_output_low))
         assert int(dut.uo_out.value) == expected_output_low
         await ClockCycles(dut.clk, 3)
 
     if int(dut.uio_out.value) >> 4 == 0b1110:
+        # Check output high
         dut._log.info("Check output high: {}".format(expected_output_high))
         assert int(dut.uo_out.value) == expected_output_high
         await ClockCycles(dut.clk, 3)
+
+    if int(dut.uio_out.value) >> 4 == 0b0001:
+        # Error
+        dut._log.info("Error: {}".format(int(dut.uo_out.value)))
+        # assert False, "Error occurred during processing"
+        await ClockCycles(dut.clk, 3)
+
+    if int(dut.uio_out.value) >> 4 == 0b0000:
+        # NOP
+        dut._log.info("NOP")
+        await ClockCycles(dut.clk, 1)
+

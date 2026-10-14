@@ -1,6 +1,8 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1791975009" />
-    <testcase name="test_project" classname="test" file="/Users/gianlucarainis/Documents/GitHub_Projects/ASILUC/test/test.py" lineno="9" time="0.0010733604431152344" sim_time_ns="130000.0" ratio_time="121114953.35406487" />
+    <property name="random_seed" value="1791976222" />
+    <testcase name="test_project" classname="test" file="/Users/gianlucarainis/Documents/GitHub_Projects/ASILUC/test/test.py" lineno="9" time="0.00014901161193847656" sim_time_ns="0.0" ratio_time="0.0">
+      <failure error_type="ZeroDivisionError" error_msg="division by zero" />
+    </testcase>
   </testsuite>
 </testsuites>
