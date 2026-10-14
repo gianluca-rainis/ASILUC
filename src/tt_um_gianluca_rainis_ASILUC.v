@@ -35,15 +35,15 @@ module tt_um_gianluca_rainis_ASILUC (
   reg [3:0] command_in; // The command received from the uio_in[3:0] inputs
   reg [7:0] first_number_in;  // First number for the operation
   reg [7:0] second_number_in; // Second number for the operation
-  reg [15:0] number_out;  // The result of the operation (16 bits)
 
   reg previous_command_NOP = 1'b0;  // Flag to indicate if the previous command was NOP
   reg [3:0] asiluc_status = 4'b0000;  // Status register for ASILUC
-  reg error_reg = 1'b0; // Error register for ASILUC
-  reg done_calculation = 1'b0;  // Done signal for the calculation module
 
   wire last_cycle;  // Signal to indicate the last cycle of the clock counter has been reached
   wire run_phase_timer;  // If run the clock phase_timer
+  wire error_reg; // Error wire for ASILUC
+  wire done_calculation;  // Done signal for the calculation module
+  wire [15:0] number_out; // The result of the operation (16 bits)
 
   reg handle_command_input = 1'b1;  // Flag to indicate if handling command input
   reg handle_number_input = 1'b0;   // Flag to indicate if handling number input
@@ -65,7 +65,7 @@ module tt_um_gianluca_rainis_ASILUC (
     .clk(clk),
     .rst_n(rst_n),
     .error(error_reg),
-    .start(asiluc_status == 4'b1000),  // Start calculation when ASILUC is in calculation state
+    .start(asiluc_status == 4'b1000 && !done_calculation),  // Start calculation when ASILUC is in calculation state
     .done(done_calculation) // Done when calculation is complete
   );
 
@@ -76,7 +76,6 @@ module tt_um_gianluca_rainis_ASILUC (
       command_in <= 4'b0000;  // Reset command on reset
       first_number_in <= 8'b00000000; // Reset first number on reset
       second_number_in <= 8'b00000000;  // Reset second number on reset
-      number_out <= 16'b0000000000000000; // Reset result on reset
 
       asiluc_status <= 4'b0000;     // Reset status on reset
       handle_command_input <= 1'b1; // Reset command input flag on reset
@@ -118,24 +117,24 @@ module tt_um_gianluca_rainis_ASILUC (
         end
         else if (last_cycle && asiluc_status == 4'b0110) begin
           second_number_in <= ui_in; // Save second number
-          handle_calculation <= 1'b1; // Calculating
 
+          handle_calculation <= 1'b1; // Handle calculation
           handle_number_input <= 1'b0; // Stop handling number input
+
+          asiluc_status <= 4'b1000; // Go in calculation state
         end
       end
       else if (handle_calculation) begin  // Handle calculation
-        asiluc_status <= 4'b1000; // Calculation in progress
-
         if (done_calculation) begin
           if (error_reg) begin
             asiluc_status <= 4'b0001; // Error occurred
           end
           else begin
             asiluc_status <= 4'b1100; // Calculation done | Output (lower byte) expected
+            handle_output <= 1'b1;  // Start handling output
           end
 
           handle_calculation <= 1'b0; // Stop handling calculation
-          handle_output <= 1'b1;      // Start handling output
         end
       end
       else if (handle_output) begin // Handle output
@@ -146,12 +145,11 @@ module tt_um_gianluca_rainis_ASILUC (
           asiluc_status <= 4'b0000; // Output done | Idle
 
           handle_output <= 1'b0;  // Stop handling output
+          handle_command_input <= 1'b1; // Start handling command input
         end
       end
       else begin  // Invalid state, reset
         asiluc_status <= 4'b0001; // Error: Invalid state, reset to idle
-        number_out <= 16'b0000000000000000; // Reset result
-        number_out[3:0] <= 4'b0000; // Set error code to Generic Error
 
         if (last_cycle) begin
           previous_command_NOP <= 1'b0; // Reset NOP flag on reset
@@ -159,7 +157,6 @@ module tt_um_gianluca_rainis_ASILUC (
           command_in <= 4'b0000;  // Reset command on reset
           first_number_in <= 8'b00000000; // Reset first number on reset
           second_number_in <= 8'b00000000;  // Reset second number on reset
-          number_out <= 16'b0000000000000000; // Reset result on reset
 
           asiluc_status <= 4'b0000;     // Reset status on reset
           handle_command_input <= 1'b1; // Reset command input flag on reset
