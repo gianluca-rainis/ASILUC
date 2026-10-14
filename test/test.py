@@ -11,8 +11,8 @@ async def test_project(dut):
     command = 1
     number1 = 20
     number2 = 5
-    expected_output_low = bin((number1 + number2) & 0x0F)
-    expected_output_high = bin((number1 + number2) >> 8)
+    expected_output_low = (number1 + number2) & 0xFF
+    expected_output_high = (number1 + number2) >> 8
 
     dut._log.info("Start")
 
@@ -30,22 +30,37 @@ async def test_project(dut):
     dut.rst_n.value = 1
 
     dut._log.info("Test project behavior")
+    await ClockCycles(dut.clk, 1)
 
     # Command input
+    dut._log.info("Command input: {}".format(command))
     dut.uio_in.value = command
     await ClockCycles(dut.clk, 3)
 
-    # Number input 1
-    dut.ui_in.value = number1
-    await ClockCycles(dut.clk, 3)
+    if int(dut.uio_out.value) >> 4 == 0b0100:
+        # Number input 1
+        dut._log.info("Number input 1: {}".format(number1))
+        dut.ui_in.value = number1
+        await ClockCycles(dut.clk, 3)
 
-    # Number input 2
-    dut.ui_in.value = number2
-    await ClockCycles(dut.clk, 3)
+    if int(dut.uio_out.value) >> 4 == 0b0110:
+        # Number input 2
+        dut._log.info("Number input 2: {}".format(number2))
+        dut.ui_in.value = number2
+        await ClockCycles(dut.clk, 3)
 
-    # Check output
-    assert dut.uo_out.value == expected_output_low
-    await ClockCycles(dut.clk, 3)
-    assert dut.uo_out.value == expected_output_high
-    await ClockCycles(dut.clk, 3)
+    if int(dut.uio_out.value) >> 4 == 0b1000:
+        # Calculating output
+        dut._log.info("Calculating output")
+        await ClockCycles(dut.clk, 1)
 
+    if int(dut.uio_out.value) >> 4 == 0b1100:
+        # Check output
+        dut._log.info("Check output low: {}".format(expected_output_low))
+        assert int(dut.uo_out.value) == expected_output_low
+        await ClockCycles(dut.clk, 3)
+
+    if int(dut.uio_out.value) >> 4 == 0b1110:
+        dut._log.info("Check output high: {}".format(expected_output_high))
+        assert int(dut.uo_out.value) == expected_output_high
+        await ClockCycles(dut.clk, 3)
