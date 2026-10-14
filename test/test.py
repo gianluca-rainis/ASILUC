@@ -8,6 +8,12 @@ from cocotb.triggers import ClockCycles
 
 @cocotb.test()
 async def test_project(dut):
+    command = 1
+    number1 = 20
+    number2 = 5
+    expected_output_low = bin((number1 + number2) & 0x0F)
+    expected_output_high = bin((number1 + number2) >> 8)
+
     dut._log.info("Start")
 
     # Set the clock period to 10 us (100 KHz)
@@ -25,16 +31,21 @@ async def test_project(dut):
 
     dut._log.info("Test project behavior")
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    # Command input
+    dut.uio_in.value = command
+    await ClockCycles(dut.clk, 3)
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+    # Number input 1
+    dut.ui_in.value = number1
+    await ClockCycles(dut.clk, 3)
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
+    # Number input 2
+    dut.ui_in.value = number2
+    await ClockCycles(dut.clk, 3)
 
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
+    # Check output
+    assert dut.uo_out.value == expected_output_low
+    await ClockCycles(dut.clk, 3)
+    assert dut.uo_out.value == expected_output_high
+    await ClockCycles(dut.clk, 3)
+
