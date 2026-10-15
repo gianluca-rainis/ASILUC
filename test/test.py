@@ -55,6 +55,7 @@ async def test_project(dut):
         whileCounter += 1
 
     dut._log.info("While loop exited with counter: {}".format(whileCounter))
+    assert whileCounter < 20, "Timeout waiting for number input 1 state"
 
     whileCounter = 0
 
@@ -73,6 +74,7 @@ async def test_project(dut):
         whileCounter += 1
     
     dut._log.info("While loop exited with counter: {}".format(whileCounter))
+    assert whileCounter < 20, "Timeout waiting for number input 2 state"
 
     whileCounter = 0
 
@@ -90,6 +92,7 @@ async def test_project(dut):
         whileCounter += 1
 
     dut._log.info("While loop exited with counter: {}".format(whileCounter))
+    assert whileCounter < 20, "Timeout waiting for calculating output state"
 
     dut._log.info("Output expected: {}".format(operation_result))
 
@@ -110,6 +113,7 @@ async def test_project(dut):
         whileCounter += 1
 
     dut._log.info("While loop exited with counter: {}".format(whileCounter))
+    assert whileCounter < 20, "Timeout waiting for check output low state"
 
     whileCounter = 0
 
@@ -128,6 +132,7 @@ async def test_project(dut):
         whileCounter += 1
 
     dut._log.info("While loop exited with counter: {}".format(whileCounter))
+    assert whileCounter < 20, "Timeout waiting for check output high state"
 
     if int(dut.uio_out.value) >> 4 == 0b0001:
         # Error
