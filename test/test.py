@@ -15,6 +15,8 @@ async def test_project(dut):
     expected_output_low = (operation_result) & 0xFF
     expected_output_high = (operation_result) >> 8
 
+    whileCounter = 0
+
     dut._log.info("Start")
 
     # Set the clock period to 10 us (100 KHz)
@@ -37,38 +39,95 @@ async def test_project(dut):
     dut._log.info("Command input: {}".format(command))
     dut.uio_in.value = command
     await ClockCycles(dut.clk, 3)
-    await ClockCycles(dut.clk, 3)
 
-    if int(dut.uio_out.value) >> 4 == 0b0100:
-        # Number input 1
-        dut._log.info("Number input 1: {}".format(number1))
-        dut.ui_in.value = number1
-        await ClockCycles(dut.clk, 3)
+    while whileCounter < 20:
+        if int(dut.uio_out.value) >> 4 == 0b0100:
+            # Number input 1
+            dut._log.info("Number input 1: {}".format(number1))
+            dut.ui_in.value = number1
+            await ClockCycles(dut.clk, 3)
 
-    if int(dut.uio_out.value) >> 4 == 0b0110:
-        # Number input 2
-        dut._log.info("Number input 2: {}".format(number2))
-        dut.ui_in.value = number2
-        await ClockCycles(dut.clk, 3)
+            break
+        else:
+            dut._log.info("Unexpected state: {}".format(int(dut.uio_out.value)))
+            await ClockCycles(dut.clk, 1)
 
-    if int(dut.uio_out.value) >> 4 == 0b1000:
-        # Calculating output
-        dut._log.info("Calculating output")
-        await ClockCycles(dut.clk, 1)
+        whileCounter += 1
+
+    dut._log.info("While loop exited with counter: {}".format(whileCounter))
+
+    whileCounter = 0
+
+    while whileCounter < 20:
+        if int(dut.uio_out.value) >> 4 == 0b0110:
+            # Number input 2
+            dut._log.info("Number input 2: {}".format(number2))
+            dut.ui_in.value = number2
+            await ClockCycles(dut.clk, 3)
+
+            break
+        else:
+            dut._log.info("Unexpected state: {}".format(int(dut.uio_out.value)))
+            await ClockCycles(dut.clk, 1)
+
+        whileCounter += 1
+    
+    dut._log.info("While loop exited with counter: {}".format(whileCounter))
+
+    whileCounter = 0
+
+    while whileCounter < 20:
+        if int(dut.uio_out.value) >> 4 == 0b1000:
+            # Calculating output
+            dut._log.info("Calculating output")
+            await ClockCycles(dut.clk, 1)
+
+            break
+        else:
+            dut._log.info("Unexpected state: {}".format(int(dut.uio_out.value)))
+            await ClockCycles(dut.clk, 1)
+
+        whileCounter += 1
+
+    dut._log.info("While loop exited with counter: {}".format(whileCounter))
 
     dut._log.info("Output expected: {}".format(operation_result))
 
-    if int(dut.uio_out.value) >> 4 == 0b1100:
-        # Check output low
-        dut._log.info("Check output low: {}".format(expected_output_low))
-        assert int(dut.uo_out.value) == expected_output_low
-        await ClockCycles(dut.clk, 3)
+    whileCounter = 0
 
-    if int(dut.uio_out.value) >> 4 == 0b1110:
-        # Check output high
-        dut._log.info("Check output high: {}".format(expected_output_high))
-        assert int(dut.uo_out.value) == expected_output_high
-        await ClockCycles(dut.clk, 3)
+    while whileCounter < 20:
+        if int(dut.uio_out.value) >> 4 == 0b1100:
+            # Check output low
+            dut._log.info("Check output low: {}".format(expected_output_low))
+            assert int(dut.uo_out.value) == expected_output_low
+            await ClockCycles(dut.clk, 3)
+
+            break
+        else:
+            dut._log.info("Unexpected state: {}".format(int(dut.uio_out.value)))
+            await ClockCycles(dut.clk, 1)
+
+        whileCounter += 1
+
+    dut._log.info("While loop exited with counter: {}".format(whileCounter))
+
+    whileCounter = 0
+
+    while whileCounter < 20:
+        if int(dut.uio_out.value) >> 4 == 0b1110:
+            # Check output high
+            dut._log.info("Check output high: {}".format(expected_output_high))
+            assert int(dut.uo_out.value) == expected_output_high
+            await ClockCycles(dut.clk, 3)
+
+            break
+        else:
+            dut._log.info("Unexpected state: {}".format(int(dut.uio_out.value)))
+            await ClockCycles(dut.clk, 1)
+
+        whileCounter += 1
+
+    dut._log.info("While loop exited with counter: {}".format(whileCounter))
 
     if int(dut.uio_out.value) >> 4 == 0b0001:
         # Error
@@ -79,5 +138,8 @@ async def test_project(dut):
     if int(dut.uio_out.value) >> 4 == 0b0000:
         # NOP
         dut._log.info("NOP")
+        await ClockCycles(dut.clk, 1)
+    else:
+        dut._log.info("Unexpected state: {}".format(int(dut.uio_out.value)))
         await ClockCycles(dut.clk, 1)
 
