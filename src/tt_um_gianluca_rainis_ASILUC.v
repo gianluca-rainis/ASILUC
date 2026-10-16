@@ -90,7 +90,7 @@ module tt_um_gianluca_rainis_ASILUC (
         if (command_in == 4'b0000) begin
           previous_command_NOP <= 1'b1; // NOP, set flag
         end
-        else if (command_in >= 4'b0101 && command_in <= 4'b1111) begin  // Invalid command range
+        else if (command_in >= 4'b0101) begin // Invalid command range: 0101-1111
           previous_command_NOP <= 1'b0; // Reset flag if command is not NOP
           handle_number_input <= 1'b0;  // Reset number input flag
         end
