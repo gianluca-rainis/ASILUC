@@ -12,7 +12,7 @@ module phase_timer_ASILUC (
     output  wire    last_cycle  // High if the last cycle has been reached
 );
 
-  reg [1:0] clock_counter = 2'b00;  // Counter to track clock cycles
+  reg [1:0] clock_counter;  // Counter to track clock cycles
 
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin

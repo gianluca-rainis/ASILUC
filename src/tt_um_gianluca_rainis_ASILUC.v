@@ -36,8 +36,8 @@ module tt_um_gianluca_rainis_ASILUC (
   reg [7:0] first_number_in;  // First number for the operation
   reg [7:0] second_number_in; // Second number for the operation
 
-  reg previous_command_NOP = 1'b0;  // Flag to indicate if the previous command was NOP
-  reg [3:0] asiluc_status = 4'b0000;  // Status register for ASILUC
+  reg previous_command_NOP; // Flag to indicate if the previous command was NOP
+  reg [3:0] asiluc_status;  // Status register for ASILUC
 
   wire last_cycle;  // Signal to indicate the last cycle of the clock counter has been reached
   wire run_phase_timer;  // If run the clock phase_timer
@@ -45,10 +45,10 @@ module tt_um_gianluca_rainis_ASILUC (
   wire done_calculation;  // Done signal for the calculation module
   wire [15:0] number_out; // The result of the operation (16 bits)
 
-  reg handle_command_input = 1'b1;  // Flag to indicate if handling command input
-  reg handle_number_input = 1'b0;   // Flag to indicate if handling number input
-  reg handle_calculation = 1'b0;    // Flag to indicate if handling calculation
-  reg handle_output = 1'b0;         // Flag to indicate if handling output
+  reg handle_command_input; // Flag to indicate if handling command input
+  reg handle_number_input;  // Flag to indicate if handling number input
+  reg handle_calculation;   // Flag to indicate if handling calculation
+  reg handle_output;        // Flag to indicate if handling output
 
   phase_timer_ASILUC phase_timer (
     .run(run_phase_timer),
