@@ -1,17 +1,17 @@
 # Tiny Tapeout project information
 project:
-  title:        "ASILUC"      # Project title
-  author:       "Gianluca Rainis"      # Your name
-  discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "An ASIC designed to function as an ALU."      # One line description of what your project does
-  language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
-  clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
+  title: "ASILUC" # Project title
+  author: "Gianluca Rainis" # Your name
+  discord: "" # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
+  description: "An ASIC designed to function as an ALU." # One line description of what your project does
+  language: "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
+  clock_hz: 16000000 # Clock frequency in Hz (or 0 if not applicable)
 
   # How many tiles your design occupies? A single tile is about 340x160 uM.
-  tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 3x4 or 4x4
+  tiles: "1x1" # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 3x4 or 4x4
 
   # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_gianluca_rainis_ASILUC"
+  top_module: "tt_um_gianluca_rainis_ASILUC"
 
   # List your project's source files here.
   # Source files must be in ./src and you must list each source file separately, one per line.
@@ -25,34 +25,34 @@ project:
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
 pinout:
   # Inputs
-  ui[0]: ""
-  ui[1]: ""
-  ui[2]: ""
-  ui[3]: ""
-  ui[4]: ""
-  ui[5]: ""
-  ui[6]: ""
-  ui[7]: ""
+  ui[0]: "Numbers_input"
+  ui[1]: "Numbers_input"
+  ui[2]: "Numbers_input"
+  ui[3]: "Numbers_input"
+  ui[4]: "Numbers_input"
+  ui[5]: "Numbers_input"
+  ui[6]: "Numbers_input"
+  ui[7]: "Numbers_input"
 
   # Outputs
-  uo[0]: ""
-  uo[1]: ""
-  uo[2]: ""
-  uo[3]: ""
-  uo[4]: ""
-  uo[5]: ""
-  uo[6]: ""
-  uo[7]: ""
+  uo[0]: "Result_or_Error_code"
+  uo[1]: "Result_or_Error_code"
+  uo[2]: "Result_or_Error_code"
+  uo[3]: "Result_or_Error_code"
+  uo[4]: "Result"
+  uo[5]: "Result"
+  uo[6]: "Result"
+  uo[7]: "Result"
 
   # Bidirectional pins
-  uio[0]: ""
-  uio[1]: ""
-  uio[2]: ""
-  uio[3]: ""
-  uio[4]: ""
-  uio[5]: ""
-  uio[6]: ""
-  uio[7]: ""
+  uio[0]: "Command_input"
+  uio[1]: "Command_input"
+  uio[2]: "Command_input"
+  uio[3]: "Command_input"
+  uio[4]: "error"
+  uio[5]: "highByte"
+  uio[6]: "status"
+  uio[7]: "busy"
 
 # Do not change!
 yaml_version: 6
