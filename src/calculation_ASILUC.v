@@ -23,7 +23,7 @@ module calculation_ASILUC (
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            result_reg <= 16'b0000000000000000; // Reset result to zero
+            result_reg <= 16'b0;    // Reset result to zero
             done_reg <= 1'b0;                   // Reset done signal
             error_reg <= 1'b0;  // Default no error
         end
@@ -32,20 +32,20 @@ module calculation_ASILUC (
 
             if (start) begin
                 case (command)
-                    4'b0000: result_reg <= 16'b0000000000000000;    // NOP
-                    4'b0001: result_reg <= { 8'b00000000, number1 } + { 8'b00000000, number2 };  // Addition
-                    4'b0010: result_reg <= { 8'b00000000, number1 } - { 8'b00000000, number2 };  // Subtraction
-                    4'b0011: result_reg <= number1 * number2;       // Multiplication
+                    4'b0000: result_reg <= 16'b0;   // NOP
+                    4'b0001: result_reg <= { 8'b0, number1 } + { 8'b0, number2 };   // Addition
+                    4'b0010: result_reg <= { 8'b0, number1 } - { 8'b0, number2 };   // Subtraction
+                    4'b0011: result_reg <= number1 * number2;   // Multiplication
                     4'b0100: begin
                         if (number2 != 0) begin
-                            result_reg <= { 8'b00000000, number1 / number2 };   // Division
+                            result_reg <= { 8'b0, number1 / number2 };  // Division
                         end
                         else begin
                             error_reg <= 1'b1;                  // Error: Division by zero
                             result_reg <= 16'b0000000000000001; // Error: Division by zero
                         end
                     end
-                    default: result_reg <= 16'b0000000000000000;    // Default case, return zero
+                    default: result_reg <= 16'b0;   // Default case, return zero
                 endcase
 
                 done_reg <= 1'b1;   // Calculation done
