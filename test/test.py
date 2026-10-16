@@ -1,5 +1,7 @@
 # SPDX-FileCopyrightText: © 2024 Tiny Tapeout
 # SPDX-License-Identifier: Apache-2.0
+# -------------------------------------------
+# Copyright (c) 2026 Gianluca Rainis
 
 import cocotb
 from cocotb.clock import Clock
@@ -9,8 +11,8 @@ from cocotb.triggers import ClockCycles
 @cocotb.test()
 async def test_project(dut):
     command = 1
-    number1 = 21
-    number2 = 36
+    number1 = 201
+    number2 = 90
     operation_result = int(number1 + number2)   # Change the operation here
     expected_output_low = (operation_result) & 0xFF
     expected_output_high = (operation_result) >> 8
@@ -49,14 +51,12 @@ async def test_project(dut):
 
             break
         else:
-            dut._log.info("Unexpected state: {}".format(int(dut.uio_out.value)))
+            dut._log.info("   Unexpected state: {}".format(int(dut.uio_out.value)))
             await ClockCycles(dut.clk, 1)
 
         whileCounter += 1
 
-    dut._log.info("While loop exited with counter: {}".format(whileCounter))
     assert whileCounter < 20, "Timeout waiting for number input 1 state"
-
     whileCounter = 0
 
     while whileCounter < 20:
@@ -68,14 +68,12 @@ async def test_project(dut):
 
             break
         else:
-            dut._log.info("Unexpected state: {}".format(int(dut.uio_out.value)))
+            dut._log.info("   Unexpected state: {}".format(int(dut.uio_out.value)))
             await ClockCycles(dut.clk, 1)
 
         whileCounter += 1
-    
-    dut._log.info("While loop exited with counter: {}".format(whileCounter))
-    assert whileCounter < 20, "Timeout waiting for number input 2 state"
 
+    assert whileCounter < 20, "Timeout waiting for number input 2 state"
     whileCounter = 0
 
     while whileCounter < 20:
@@ -86,17 +84,15 @@ async def test_project(dut):
 
             break
         else:
-            dut._log.info("Unexpected state: {}".format(int(dut.uio_out.value)))
+            dut._log.info("   Unexpected state: {}".format(int(dut.uio_out.value)))
             await ClockCycles(dut.clk, 1)
 
         whileCounter += 1
 
-    dut._log.info("While loop exited with counter: {}".format(whileCounter))
     assert whileCounter < 20, "Timeout waiting for calculating output state"
+    whileCounter = 0
 
     dut._log.info("Output expected: {}".format(operation_result))
-
-    whileCounter = 0
 
     while whileCounter < 20:
         if int(dut.uio_out.value) >> 4 == 0b1100:
@@ -107,14 +103,12 @@ async def test_project(dut):
 
             break
         else:
-            dut._log.info("Unexpected state: {}".format(int(dut.uio_out.value)))
+            dut._log.info("   Unexpected state: {}".format(int(dut.uio_out.value)))
             await ClockCycles(dut.clk, 1)
 
         whileCounter += 1
 
-    dut._log.info("While loop exited with counter: {}".format(whileCounter))
     assert whileCounter < 20, "Timeout waiting for check output low state"
-
     whileCounter = 0
 
     while whileCounter < 20:
@@ -126,12 +120,11 @@ async def test_project(dut):
 
             break
         else:
-            dut._log.info("Unexpected state: {}".format(int(dut.uio_out.value)))
+            dut._log.info("   Unexpected state: {}".format(int(dut.uio_out.value)))
             await ClockCycles(dut.clk, 1)
 
         whileCounter += 1
 
-    dut._log.info("While loop exited with counter: {}".format(whileCounter))
     assert whileCounter < 20, "Timeout waiting for check output high state"
 
     if int(dut.uio_out.value) >> 4 == 0b0001:
@@ -145,6 +138,8 @@ async def test_project(dut):
         dut._log.info("NOP")
         await ClockCycles(dut.clk, 1)
     else:
-        dut._log.info("Unexpected state: {}".format(int(dut.uio_out.value)))
+        dut._log.info("   Unexpected state: {}".format(int(dut.uio_out.value)))
         await ClockCycles(dut.clk, 1)
+
+    assert int(dut.uio_out.value) >> 4 == 0b0000, "Unexpected state after processing"
 
