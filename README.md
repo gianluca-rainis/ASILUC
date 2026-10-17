@@ -36,5 +36,5 @@ Every design decision is the original work of the author.
 ![ASILUC 2D Preview](/images/ASILUCPreview2D.png)
 *ASILUC 2D Preview Image*
 
-![ASILUC 2D Preview](/images/ASILUCSumExample.mov)
+![ASILUC 2D Preview](/images/ASILUCSumExample.mp4)
 *ASILUC Simulation Video - Sum of two numbers*
