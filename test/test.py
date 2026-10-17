@@ -10,10 +10,10 @@ from cocotb.triggers import ClockCycles
 
 @cocotb.test()
 async def test_project(dut):
-    command = 1
-    number1 = 201
-    number2 = 90
-    operation_result = int(number1 + number2)   # Change the operation here
+    command = 1                                 # Change the command to execute here
+    number1 = 201                               # Change the first number of the operation here (0-255)
+    number2 = 90                                # Change the second number of the operation here (0-255)
+    operation_result = int(number1 + number2)   # Change the operation here (+, -, *, /, ...)
     expected_output_low = (operation_result) & 0xFF
     expected_output_high = (operation_result) >> 8
 

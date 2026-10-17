@@ -97,7 +97,45 @@ For the master:
 |Ø|Error|0-2|0|0|0|1|
 
 ## How to test
-Explain how to use your project
+To simulate the behavior of ASILUC, I reccomand one of those two choices:
+1. Local Simulation
+2. Web Simulation
 
-## External hardware
-List external hardware used in your project
+### Local Simulation
+Download the [ASILUC Repository](https://github.com/gianluca-rainis/ASILUC) from GitHub and install the [OSS CAD Suite](https://github.com/yosyshq/oss-cad-suite-build) on your machine.
+
+Go to the root of the ASILUC repository, go to `/test` and run
+```bash
+make -B
+```
+
+This will compile the project and run the test written in `/test/test.py`.
+
+To change the test to execute you can edit the following variables in `/test/test.py`:
+```python
+    command = 1                                 # Change the command to execute here
+    number1 = 201                               # Change the first number of the operation here (0-255)
+    number2 = 90                                # Change the second number of the operation here (0-255)
+    operation_result = int(number1 + number2)   # Change the operation here (+, -, *, /, ...)
+```
+And then re-make the project.
+This will always run a complete test on ASILUC for the given command, numbers and expected result.
+
+#### Run module-specific tests
+With the Local Simulation you can also test the internal modules of the ASILUC.
+
+The internal modules are the `calculation_ASILUC` and the `phase_timer_ASILUC`.
+
+The `phase_timer_ASILUC` **counts the clock cycles** passed since `run` is high, and return an high signal on `last_cycle` if 3 cycles passed.
+
+The `calculation_ASILUC` is the module that **performs arithmetic operations** on the two given 8-bit numbers, recognise the command regarding the operation to execute and return the 16-bit result.
+
+To test the `phase_timer_ASILUC` go to `/test/phase_timer_ASILUC_test` and follow the informations provided in the `info.md` file.
+To test the `calculation_ASILUC` go to `/test/calculation_ASILUC_test` and follow the informations provided in the `info.md` file.
+
+### Web Simulation
+The Web Simulation is the easiest way to test the ASILUC behavior.
+
+The Web Simulation is available at the following link: [ASILUC Simulation](https://gds-explorer.tinytapeout.com/viewer?file=https://gianluca-rainis.github.io/ASILUC/tinytapeout.oas&pdk=gf180mcuD).
+
+It works with *Tiny Tapeout*, and provides a graphical 2D/3D view of the ASIC, highlighting the active circuits in real time. You can change the clock speed, send inputs and look at the outputs directly from your browser.
