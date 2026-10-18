@@ -71,13 +71,15 @@ Afterwards, it returns with *busy* at 0, *status* at 0, *highByte* at 0, *error*
 
 The process restarts, listening to `uio_in` again.
 
-Some additional details:
+#### Additional informations
+**Some additional details**:
 - While the command is `NOP`, ASILUC stays in the Idle phase.
 - In Idle ASILUC looks for changes on `uio_in[3:0]`.
 - If the command read in the third cycle is `NOP` or `Reserved`, ASILUC returns to Idle without starting any transaction or operation.
 - If an error occurs during execution, *busy* goes to 0, *status* goes to 0, *highByte* to 0, and *error* to 1. The error code, associated with the type of error that occurred, is set to `uo_out[3:0]`. It waits *3 clock cycles* like this and then returns to normal.
+- The `SUB` result is `A − B` in **16-bit two’s complement**. High byte is: `0x00` if `A ≥ B`; `0xFF` if `A < B`. In case the result is a negative number, `|A − B| = 256 − low byte`.
 
-For the master:
+**For the master**:
 - Hold the command stable until `status` rises.
 - Reset the command to `0000` between operations.
 - Use a timeout to handle the case where `status` does not rise.

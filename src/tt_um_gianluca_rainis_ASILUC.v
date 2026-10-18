@@ -32,7 +32,8 @@ module tt_um_gianluca_rainis_ASILUC (
 
   assign uio_oe = 8'b11110000;  // [7:4] are outputs (status), [3:0] are inputs (commands)
 
-  reg [3:0] command_in; // The command received from the uio_in[3:0] inputs
+  reg [3:0] buf_stabilizer_command_in;  // The command received from the uio_in[3:0], temporary stored to stabilize the signal
+  reg [3:0] command_in; // The command received from the uio_in[3:0] input
   reg [7:0] first_number_in;  // First number for the operation
   reg [7:0] second_number_in; // Second number for the operation
 
@@ -76,6 +77,7 @@ module tt_um_gianluca_rainis_ASILUC (
       command_in <= 4'b0000;  // Reset command on reset
       first_number_in <= 8'b00000000; // Reset first number on reset
       second_number_in <= 8'b00000000;  // Reset second number on reset
+      buf_stabilizer_command_in <= 4'b0000; // Reset the command stabilizer buffer
 
       asiluc_status <= 4'b0000;     // Reset status on reset
       handle_command_input <= 1'b1; // Reset command input flag on reset
@@ -84,8 +86,12 @@ module tt_um_gianluca_rainis_ASILUC (
       handle_output <= 1'b0;        // Reset output flag on reset
     end
     else begin  // Normal operation
+      buf_stabilizer_command_in <= uio_in[3:0]; // Save the command in the stabilizer buffer
+      
       if (handle_command_input) begin // Handle command input
-        command_in <= uio_in[3:0];  // Save command
+        if (!previous_command_NOP || command_in >= 4'b0101 || !last_cycle) begin
+          command_in <= buf_stabilizer_command_in;  // Save the command to be processed
+        end
 
         if (command_in == 4'b0000) begin
           previous_command_NOP <= 1'b1; // NOP, set flag

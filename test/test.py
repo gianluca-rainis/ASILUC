@@ -51,6 +51,9 @@ async def test_project(dut):
             await ClockCycles(dut.clk, 3)
 
             break
+        elif int(dut.uio_out.value) >> 4 == 0b0000:
+            dut._log.info("NOP")
+            await ClockCycles(dut.clk, 3)
         elif int(dut.uio_out.value) >> 4 == 0b0001:
             dut._log.info("Error: {}".format(int(dut.uo_out.value)))
             assert False, "Error occurred during processing"
@@ -60,6 +63,12 @@ async def test_project(dut):
             await ClockCycles(dut.clk, 1)
 
         whileCounter += 1
+
+    if int(dut.uio_out.value) >> 4 == 0b0000:
+        dut._log.info("NOP: {}".format(int(dut.uo_out.value)))
+        await ClockCycles(dut.clk, 3)
+        
+        return
 
     assert whileCounter < 20, "Timeout waiting for number input 1 state"
     whileCounter = 0
