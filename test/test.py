@@ -14,6 +14,7 @@ async def test_project(dut):
     number1 = 201                               # Change the first number of the operation here (0-255)
     number2 = 90                                # Change the second number of the operation here (0-255)
     operation_result = int(number1 + number2)   # Change the operation here (+, -, *, /, ...)
+    operation_result &= 0xFFFF
     expected_output_low = (operation_result) & 0xFF
     expected_output_high = (operation_result) >> 8
 
@@ -50,6 +51,10 @@ async def test_project(dut):
             await ClockCycles(dut.clk, 3)
 
             break
+        elif int(dut.uio_out.value) >> 4 == 0b0001:
+            dut._log.info("Error: {}".format(int(dut.uo_out.value)))
+            assert False, "Error occurred during processing"
+            await ClockCycles(dut.clk, 3)
         else:
             dut._log.info("   Unexpected state: {}".format(int(dut.uio_out.value)))
             await ClockCycles(dut.clk, 1)
@@ -67,6 +72,10 @@ async def test_project(dut):
             await ClockCycles(dut.clk, 3)
 
             break
+        elif int(dut.uio_out.value) >> 4 == 0b0001:
+            dut._log.info("Error: {}".format(int(dut.uo_out.value)))
+            assert False, "Error occurred during processing"
+            await ClockCycles(dut.clk, 3)
         else:
             dut._log.info("   Unexpected state: {}".format(int(dut.uio_out.value)))
             await ClockCycles(dut.clk, 1)
@@ -83,6 +92,10 @@ async def test_project(dut):
             await ClockCycles(dut.clk, 1)
 
             break
+        elif int(dut.uio_out.value) >> 4 == 0b0001:
+            dut._log.info("Error: {}".format(int(dut.uo_out.value)))
+            assert False, "Error occurred during processing"
+            await ClockCycles(dut.clk, 3)
         else:
             dut._log.info("   Unexpected state: {}".format(int(dut.uio_out.value)))
             await ClockCycles(dut.clk, 1)
@@ -102,6 +115,10 @@ async def test_project(dut):
             await ClockCycles(dut.clk, 3)
 
             break
+        elif int(dut.uio_out.value) >> 4 == 0b0001:
+            dut._log.info("Error: {}".format(int(dut.uo_out.value)))
+            assert False, "Error occurred during processing"
+            await ClockCycles(dut.clk, 3)
         else:
             dut._log.info("   Unexpected state: {}".format(int(dut.uio_out.value)))
             await ClockCycles(dut.clk, 1)
@@ -119,6 +136,10 @@ async def test_project(dut):
             await ClockCycles(dut.clk, 3)
 
             break
+        elif int(dut.uio_out.value) >> 4 == 0b0001:
+            dut._log.info("Error: {}".format(int(dut.uo_out.value)))
+            assert False, "Error occurred during processing"
+            await ClockCycles(dut.clk, 3)
         else:
             dut._log.info("   Unexpected state: {}".format(int(dut.uio_out.value)))
             await ClockCycles(dut.clk, 1)
@@ -130,7 +151,7 @@ async def test_project(dut):
     if int(dut.uio_out.value) >> 4 == 0b0001:
         # Error
         dut._log.info("Error: {}".format(int(dut.uo_out.value)))
-        # assert False, "Error occurred during processing"
+        assert False, "Error occurred during processing"
         await ClockCycles(dut.clk, 3)
 
     if int(dut.uio_out.value) >> 4 == 0b0000:
