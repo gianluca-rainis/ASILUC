@@ -1,8 +1,13 @@
 # ASILUC
 ![License](https://img.shields.io/github/license/gianluca-rainis/ASILUC)
 ![GitHub Release](https://img.shields.io/github/v/release/gianluca-rainis/ASILUC?logo=github&color=orange)
+![GDS Badge](https://github.com/gianluca-rainis/ASILUC/workflows/gds/badge.svg)
+![Docs Badge](https://github.com/gianluca-rainis/ASILUC/workflows/docs/badge.svg)
+![Test Badge](https://github.com/gianluca-rainis/ASILUC/workflows/test/badge.svg)
+![FPGA Badge](https://github.com/gianluca-rainis/ASILUC/workflows/fpga/badge.svg)
 ![GitHub Repo stars](https://img.shields.io/github/stars/gianluca-rainis/ASILUC)
 ![GitHub watchers](https://img.shields.io/github/watchers/gianluca-rainis/ASILUC)
+
 
 ![ASILUC Logo](/images/ASILUC.png)
 
