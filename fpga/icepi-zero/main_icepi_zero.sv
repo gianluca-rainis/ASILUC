@@ -17,8 +17,20 @@ module main_icepi_zero (
     localparam WAIT_RESULT_HIGH = 3'b110;
     localparam DONE = 3'b111;
 
+    // The ASILUC Commands
+    localparam NOP = 4'b0000;
+    localparam SUM = 4'b0001;
+    localparam SUB = 4'b0010;
+    localparam MUL = 4'b0011;
+    localparam DIV = 4'b0100;
+
+    // The numbers ASILUC will operate on
+    localparam NUM1 = 8'd100;
+    localparam NUM2 = 8'd50;
+
     reg [2:0] state = RESET;
     reg [31:0] pause_counter = 0;
+    reg [1:0] test_number = 0;
     
     // tt_um_gianluca_rainis_ASILUC I/O
     reg [7:0] ui_in = 0;
@@ -52,18 +64,36 @@ module main_icepi_zero (
     always @(posedge clk) begin
         case (state)
             RESET: begin
-                if (pause_counter == 8'b10100) begin
+                if (pause_counter == 32'd20) begin
                     rst_n <= 1'b1;
                     pause_counter <= 0;
                     state <= SEND_CMD;
+                    led <= 0;
                 end
                 else begin
                     pause_counter <= pause_counter + 1'b1;
                 end
             end
             SEND_CMD: begin
-                if (pause_counter == 8'b00001010) begin
-                    uio_in <= 8'b00000001; // SUM
+                if (pause_counter == 32'd10) begin
+                    case (test_number)
+                        2'b00: begin
+                            uio_in <= SUM;
+                        end
+                        2'b01: begin
+                            uio_in <= SUB;
+                        end
+                        2'b10: begin
+                            uio_in <= MUL;
+                        end
+                        2'b11: begin
+                            uio_in <= DIV;
+                        end
+                        default: begin
+                            uio_in <= SUM;
+                        end
+                    endcase
+
                     pause_counter <= 0;
                     state <= WAIT_FIRST;
                 end
@@ -73,13 +103,13 @@ module main_icepi_zero (
             end
             WAIT_FIRST: begin
                 if (status == 4'b0100) begin
-                    ui_in <= 8'b00001010; // Set first number
+                    ui_in <= NUM1; // Set first number
                     state <= WAIT_SECOND;
                 end
             end
             WAIT_SECOND: begin
                 if (status == 4'b0110) begin
-                    ui_in <= 8'b00010100; // Set second number
+                    ui_in <= NUM2; // Set second number
                     state <= CALCULATING;
                 end
             end
@@ -119,6 +149,11 @@ module main_icepi_zero (
                 end
                 else if (pause_counter == 32'd125000000) begin
                     pause_counter <= 0;
+                    test_number <= test_number + 1'b1;
+                    ui_in <= 0;
+                    uio_in <= 0;
+                    rst_n <= 0;
+                    state <= RESET;
                 end
                 else begin
                     pause_counter <= pause_counter + 1'b1;
