@@ -17,3 +17,6 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Icepi Zero
+fpga/icepi-zero/icepi-zero
